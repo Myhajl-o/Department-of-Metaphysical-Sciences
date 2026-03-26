@@ -12,6 +12,10 @@ int main(void) {
 	etap2 b = LoadGif("gif/logodms.gif");
 	etap3 c = { 0 };
 	c = Upload3(c);
+	etap4 d = { 0 };
+	d = Upload4(d);
+	etap5 e = { 0 };
+	e = Upload5(e);
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -35,7 +39,7 @@ int main(void) {
 				}
 			}
 			if (a.v) {
-				if (IsKeyPressed(KEY_BACKSPACE)) {
+				if (IsKeyPressed(KEY_BACKSPACE)|| IsKeyPressedRepeat(KEY_BACKSPACE)) {
 					a.vb = true;
 				}
 				else {
@@ -95,7 +99,7 @@ int main(void) {
 			if (a.pere) {
 				a.peret--;
 				if (a.peret == 0) {
-					etap = 2;
+					etap = 3;
 					a.pere = false;
 				}
 			}
@@ -221,6 +225,249 @@ int main(void) {
 			c.minutes = c.tick / 60;
 			c.seconds = c.tick % 60;
 			DrawTextEx(c.mono, TextFormat("%02d:%02d",c.minutes,c.seconds), (Vector2) { 182, 546 }, 28, 2, WHITE);
+		}else if(etap==4){
+			d = UpdateScrollLogic(d);
+			Draw4(d);
+			BeginScissorMode(28,299, 1310, 425);
+			DrawTexture(d.bscroll, 1300, d.scrollY, WHITE);
+				if (d.timef1 > 0) {
+					DrawTexture(d.file12, 90, 322 - d.scrollOffset, WHITE);
+					d.inf1 = true;
+					d.timef1--;
+					if (d.timef1 == 0) {
+						d.f1 = true;
+						etap = 5;
+
+					}
+				}
+				else {
+					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 86, 300 - d.scrollOffset, 1147, 64 })) {
+						if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 28, 299, 1310, 425 })) {
+							DrawTexture(d.file11, 56, 290 - d.scrollOffset, WHITE);
+							d.inf1 = true;
+							if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+								d.timef1 = 5;
+							}
+						}
+					}
+					else {
+						DrawTexture(d.file1, 86, 320 - d.scrollOffset, WHITE);
+						d.inf1 = false;
+					}
+				}
+				if (d.timef2 > 0) {
+					DrawTexture(d.file22, 90, 420 - d.scrollOffset, WHITE);
+					d.inf2 = true;
+					d.timef2--;
+					if (d.timef2 == 0) {
+						d.f2 = true;
+						etap = 5;
+
+					}
+				}
+				else {
+					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 86, 400 - d.scrollOffset, 1147, 64 })) {
+						if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 28, 299, 1310, 425 })) {
+							DrawTexture(d.file21, 56, 388 - d.scrollOffset, WHITE);
+							d.inf2 = true;
+							if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+								d.timef2 = 30;
+							}
+						}
+					}
+					else {
+						DrawTexture(d.file2, 86, 418 - d.scrollOffset, WHITE);
+						d.inf2 = false;
+					}
+				}
+				for (d.i = 0; d.i < 5; d.i++) {
+					int resultEtap = DrawFolderButton(&d.folders[d.i], d.scrollOffset);
+					if (resultEtap != 4) {
+						etap = resultEtap;
+					}
+				}
+
+			EndScissorMode();
+			if (d.timec > 0) {
+				DrawTexture(d.close, 1292, 33, WHITE);
+				d.timec--;
+				if (d.timec == 0) {
+					break;
+				}
+			}
+			else {
+				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1289, 10, 40, 40 })) {
+					DrawTexture(d.close1, 1259, 0, WHITE);
+
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						d.timec = 30;
+					}
+				}
+				else {
+					DrawTexture(d.close, 1289, 30, WHITE);
+				}
+			}
+		}
+		else if (etap == 5) {
+			Draw5(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
+			if (e.timec > 0) {
+				DrawTexture(e.close, 1292, 33, WHITE);
+				e.timec--;
+				if (e.timec == 0) {
+					break;
+				}
+			}
+			else {
+				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1289, 10, 40, 40 }) && !e.wp) {
+					DrawTexture(e.close1, 1259, 0, WHITE);
+
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.timec = 30;
+					}
+				}
+				else {
+					DrawTexture(e.close, 1289, 30, WHITE);
+				}
+			}
+			if (e.timeb > 0) {
+				DrawTexture(e.back2, 30, 30, WHITE);
+				e.timeb--;
+				if (e.timeb == 0) {
+					d.f1 = false;
+					d.f2 = false;
+					d.folders[0].f = false;
+					d.folders[1].f = false;
+					d.folders[2].f = false;
+					d.folders[3].f = false;
+					d.folders[4].f = false;
+					e.isFileLoaded = false;
+					e.scrollY = 0;
+					e.dragging = false;
+					e.draggingofset = 0;
+					e.ratio = 0;
+					e.scrolloffset = 0;
+					e.edit = false;
+					e.cursor = false;
+					memset(e.password, 0, 20);
+					e.i1 = 0;
+					e.save = false;
+					etap = 4;
+				}
+			}
+			else {
+				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 25, 10, 50, 80 }) && !e.wp) {
+					DrawTexture(e.back1, 5, 0, WHITE);
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.timeb = 5;
+					}
+				}
+				else {
+					DrawTexture(e.back, 25, 20, WHITE);
+				}
+			}
+			if (e.isFileLoaded == false && etap == 5) {
+				e = textfile(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
+				e.k = strlen(e.textBuffer);
+			}
+			e.texth = MeasureTextEx(e.inter, e.textBuffer, 20, 2.0f).y;
+			e.maxScroll = e.texth + 100;
+			if (!e.wp) {
+				e = Scrollogic(e);
+			}
+			BeginScissorMode(10, 168, 1346, 584);
+			if (e.cursor) {
+				DrawRectangle(e.x, e.cursorY, 12, 3, RAYWHITE);
+			}
+			DrawTextEx(e.inter, e.textBuffer, (Vector2) { 30, 180 - e.scrolloffset }, 20, 2.0f, RAYWHITE);
+			DrawTexture(e.bscroll, 1325, e.scrollY, WHITE);
+			EndScissorMode();
+			if (e.times > 0) {
+				DrawTexture(e.saveb2, 1070, 58, WHITE);
+				DrawTexture(e.saveb3, 0, 717, WHITE);
+				e.times--;
+				if (e.times == 1) {
+					Savefile(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
+				}
+			}
+			else {
+				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1065, 36, 172, 50 }) && !e.wp&&e.save) {
+					DrawTexture(e.saveb1, 1035, 26, WHITE);
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.times = 20;
+					}
+				}
+				else {
+					DrawTexture(e.saveb, 1065, 56, WHITE);
+				}
+			}
+			if (e.edit) {
+				if (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) {
+					e.bs = true;
+				}
+				else {
+					e.bs = false;
+				}
+				if (IsKeyPressed(KEY_ENTER)) {
+					e.enter = true;
+				}
+				else {
+					e.enter = false;
+				}
+				if (IsKeyPressed(KEY_LEFT) || IsKeyPressedRepeat(KEY_LEFT)) {
+					e.left = true;
+				}
+				else {
+					e.left = false;
+				}
+				if (IsKeyPressed(KEY_RIGHT) || IsKeyPressedRepeat(KEY_RIGHT)) {
+					e.right = true;
+				}
+				else {
+					e.right = false;
+				}
+				if (IsKeyPressed(KEY_UP) || IsKeyPressedRepeat(KEY_UP)) {
+					e.up = true;
+				}
+				else {
+					e.up = false;
+				}
+				if (IsKeyPressed(KEY_DOWN) || IsKeyPressedRepeat(KEY_DOWN)) {
+					e.down = true;
+				}
+				else {
+					e.down = false;
+				}
+				e = editmode(e);
+				if ((((a.fps / 20) % 3) == 0) || (((a.fps / 20) % 3) == 1)) {
+					float lineH = MeasureTextEx(e.inter, "A", 22, 2.0f).y;
+					e.cursorY = (180 - e.scrolloffset) + ((e.linecout - 1) * lineH) + 14;
+					e.cursor = true;
+				}
+				else {
+					e.cursor = false;
+				}
+			}
+			else {
+				DrawTexture(e.novedit, 0, 112, WHITE);
+				if (e.wp) {
+					DrawTexture(e.winp, 0, 552, WHITE);
+					e = editpassword(e);
+					DrawTextEx(e.inter, e.password, (Vector2) { 175, 645 }, 24, 2.0f, BLACK);
+				}
+				else {
+					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1172, 97, 146, 38 })) {
+						DrawTexture(e.editb1, 1142, 87, WHITE);
+
+						if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+							e.wp = true;
+							e.i1 = 0;
+						}
+					}
+					else {
+						DrawTexture(e.editb, 1172, 117, WHITE);
+					}
+				}
+			}
 		}
 		EndDrawing();
 	}
@@ -258,5 +505,58 @@ int main(void) {
 	UnloadTexture(c.audiob);
 	UnloadTexture(c.audiob1);
 	CloseAudioDevice();
+	UnloadTexture(d.fon);
+	UnloadTexture(d.dms);
+	UnloadTexture(d.field);
+	UnloadTexture(d.scroll);
+	UnloadTexture(d.bscroll);
+	UnloadTexture(d.file1);
+	UnloadTexture(d.infofile1);
+	UnloadTexture(d.file11);
+	UnloadTexture(d.file12);
+	UnloadTexture(d.file2);
+	UnloadTexture(d.infofile2);
+	UnloadTexture(d.file21);
+	UnloadTexture(d.file22);
+	UnloadTexture(d.close);
+	UnloadTexture(d.close1);
+	UnloadTexture(d.close2);
+	for (d.i = 0; d.i < 5; d.i++) {
+		UnloadTexture(d.folders[d.i].file);
+		UnloadTexture(d.folders[d.i].file1);
+		UnloadTexture(d.folders[d.i].file2);
+	}
+	UnloadTexture(e.fon);
+	UnloadTexture(e.novebar);
+	UnloadTexture(e.novedit);
+	UnloadTexture(e.scroll);
+	UnloadTexture(e.bscroll);
+	UnloadTexture(e.close);
+	UnloadTexture(e.close1);
+	UnloadTexture(e.close2);
+	UnloadTexture(e.back);
+	UnloadTexture(e.back1);
+	UnloadTexture(e.back2);
+	UnloadTexture(e.editb);
+	UnloadTexture(e.editb1);
+	UnloadTexture(e.winp);
+	UnloadTexture(e.continueb);
+	UnloadTexture(e.continueb1);
+	UnloadTexture(e.exit);
+	UnloadTexture(e.exit1);
+	UnloadTexture(e.saveb);
+	UnloadTexture(e.saveb1);
+	UnloadTexture(e.saveb2);
+	UnloadTexture(e.saveb3);
+	UnloadTexture(e.textf1);
+	UnloadTexture(e.textf2);
+	UnloadTexture(e.textf3);
+	UnloadTexture(e.textf4);
+	UnloadTexture(e.textf5);
+	UnloadTexture(e.textf6);
+	UnloadTexture(e.textf7);
+	UnloadFont(e.inter);
+	memset(e.textBuffer, 0, sizeof(e.textBuffer));
+	memset(e.tempLine, 0, sizeof(e.tempLine));
 	CloseWindow();
 }

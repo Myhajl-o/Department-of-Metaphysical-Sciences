@@ -1,12 +1,20 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include "name.h"
 int main(void) {
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(1366, 768, "Department of Metaphysical Sciences");
+	int monitor = GetCurrentMonitor();
+	SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+	ToggleFullscreen();
+	RenderTexture2D target = LoadRenderTexture(1366, 768);
 	InitAudioDevice();
 	SetTargetFPS(60);
 	int etap = 1;
+	CypherFile();
 	etap1 a = {0};
 	a = Upload1(a);
 	etap2 b = LoadGif("gif/logodms.gif");
@@ -17,22 +25,28 @@ int main(void) {
 	etap5 e = { 0 };
 	e = Upload5(e);
 	while (!WindowShouldClose()) {
-		BeginDrawing();
+		float scale = fminf((float)GetScreenWidth() / 1366.0f, (float)GetScreenHeight() / 768.0f);
+		Vector2 mouse = GetMousePosition();
+		Vector2 virtualMouse = { 0 };
+		virtualMouse.x = (mouse.x - (GetScreenWidth() - (1366 * scale)) * 0.5f) / scale;
+		virtualMouse.y = (mouse.y - (GetScreenHeight() - (768 * scale)) * 0.5f) / scale;
+		e.virtualMouse = virtualMouse;
+		d.virtualMouse = virtualMouse;
+		c.virtualMouse = virtualMouse;
+		BeginTextureMode(target);
 		ClearBackground(BLACK);
 		a.fps++;
 		if (etap == 1) {
 			a = Upload1v(a);
 			DrawTexture(a.dms, 58, 39, WHITE);
 			DrawTexture(a.usa, 339, 20, WHITE);
-			if (CheckCollisionPointRec(GetMousePosition(), (Rectangle){ 513, 341, 341, 56 })) {
+			if (CheckCollisionPointRec(virtualMouse, (Rectangle){ 512, 360, 341, 56 })) {
 				DrawTexture(a.vvid1, 482, 330, WHITE);
 				if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-					SetMouseCursor(MOUSE_CURSOR_IBEAM);
 					a.v = true;
 				}
 			}
 			else {
-				SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 				DrawTexture(a.vvid, 512, 360, WHITE);
 				if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 					a.v = false;
@@ -58,7 +72,7 @@ int main(void) {
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 597, 592, 171, 63 })) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 596, 611, 171, 63 })) {
 					DrawTexture(a.exit1, 566, 581, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						if (a.rub == 0) {
@@ -84,7 +98,7 @@ int main(void) {
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 892, 341, 135, 49 })) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 891, 360, 135, 49 })) {
 					DrawTexture(a.con1, 861, 330, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						if (a.time == 0) {
@@ -99,7 +113,7 @@ int main(void) {
 			if (a.pere) {
 				a.peret--;
 				if (a.peret == 0) {
-					etap = 3;
+					etap = 2;
 					a.pere = false;
 				}
 			}
@@ -124,7 +138,7 @@ int main(void) {
 			DrawTexture(c.fon, 0, 0, WHITE);
 			DrawTexture(c.dms, 36, 16, WHITE);
 			DrawTexture(c.textfield, 518, 72, WHITE);
-			c.hover = CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 525, 563, 30, 30 });
+			c.hover = CheckCollisionPointRec(virtualMouse, (Rectangle) { 525, 583, 30, 30 });
 			if (c.hover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 				c.galochka = !c.galochka;
 			}
@@ -149,11 +163,12 @@ int main(void) {
 				c.timern--;
 				if (c.timern == 0) {
 					a.fps = 0;
+					e.cypherActive[0] = true;
 					c.nextb = true;
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 884, 636, 172, 50 }) && c.galochka) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 884, 656, 172, 50 }) && c.galochka) {
 					DrawTexture(c.next1, 854, 626, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						if (c.rub == false) {
@@ -178,7 +193,7 @@ int main(void) {
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1107, 636, 172, 50 })) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 1107, 656, 172, 50 })) {
 					DrawTexture(c.cencel1, 1077, 626, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						if (c.rub == false) {
@@ -196,7 +211,7 @@ int main(void) {
 			}
 			c = Drawtext (c);
 			UpdateMusicStream(c.autext);
-			if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 55, 487, 100, 95 })) {
+			if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 55, 507, 100, 95 })) {
 				if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 					if (c.onoff) {
 						c.onoff = false;
@@ -228,8 +243,8 @@ int main(void) {
 		}else if(etap==4){
 			d = UpdateScrollLogic(d);
 			Draw4(d);
-			BeginScissorMode(28,299, 1310, 425);
 			DrawTexture(d.bscroll, 1300, d.scrollY, WHITE);
+			BeginScissorMode(28,299, 1310, 425);
 				if (d.timef1 > 0) {
 					DrawTexture(d.file12, 90, 322 - d.scrollOffset, WHITE);
 					d.inf1 = true;
@@ -241,8 +256,8 @@ int main(void) {
 					}
 				}
 				else {
-					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 86, 300 - d.scrollOffset, 1147, 64 })) {
-						if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 28, 299, 1310, 425 })) {
+					if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 86, 320 - d.scrollOffset, 1147, 64 })) {
+						if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 28, 299, 1310, 425 })) {
 							DrawTexture(d.file11, 56, 290 - d.scrollOffset, WHITE);
 							d.inf1 = true;
 							if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -266,8 +281,8 @@ int main(void) {
 					}
 				}
 				else {
-					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 86, 400 - d.scrollOffset, 1147, 64 })) {
-						if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 28, 299, 1310, 425 })) {
+					if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 86, 418 - d.scrollOffset, 1147, 64 })) {
+						if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 28, 299, 1310, 425 })) {
 							DrawTexture(d.file21, 56, 388 - d.scrollOffset, WHITE);
 							d.inf2 = true;
 							if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -281,7 +296,7 @@ int main(void) {
 					}
 				}
 				for (d.i = 0; d.i < 5; d.i++) {
-					int resultEtap = DrawFolderButton(&d.folders[d.i], d.scrollOffset);
+					int resultEtap = DrawFolderButton(&d.folders[d.i], d.scrollOffset,virtualMouse);
 					if (resultEtap != 4) {
 						etap = resultEtap;
 					}
@@ -296,7 +311,7 @@ int main(void) {
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1289, 10, 40, 40 })) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 1289, 30, 40, 40 })) {
 					DrawTexture(d.close1, 1259, 0, WHITE);
 
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -309,7 +324,14 @@ int main(void) {
 			}
 		}
 		else if (etap == 5) {
-			Draw5(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
+			e.files[0] = d.f1;
+			e.files[1] = d.f2;
+			e.files[2] = d.folders[0].f;
+			e.files[3] = d.folders[1].f;
+			e.files[4] = d.folders[2].f;
+			e.files[5] = d.folders[3].f;
+			e.files[6] = d.folders[4].f;
+			Draw5(e);
 			if (e.timec > 0) {
 				DrawTexture(e.close, 1292, 33, WHITE);
 				e.timec--;
@@ -318,9 +340,8 @@ int main(void) {
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1289, 10, 40, 40 }) && !e.wp) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 1289, 30, 40, 40 }) && !e.wp&&! e.savewin&&!e.enigmaswtch && !e.xorSwitch) {
 					DrawTexture(e.close1, 1259, 0, WHITE);
-
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						e.timec = 30;
 					}
@@ -351,11 +372,20 @@ int main(void) {
 					memset(e.password, 0, 20);
 					e.i1 = 0;
 					e.save = false;
+					memset(e.starten, false, 3);
+					memset(e.numBuffer0, '\0', 10);
+					memset(e.numBuffer1, '\0', 10);
+					memset(e.numBuffer2, '\0', 10);
+					memset(e.cypherActive, false, 10);
+					e.canUndo = false;
+					e.canUndo1 = false;
+					e.canUndo2 = false;
+					e.cypherActive[0] = true;
 					etap = 4;
 				}
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 25, 10, 50, 80 }) && !e.wp) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 25, 20, 50, 80 }) && !e.wp&&!e.savewin&&!e.enigmaswtch && !e.xorSwitch) {
 					DrawTexture(e.back1, 5, 0, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 						e.timeb = 5;
@@ -366,41 +396,40 @@ int main(void) {
 				}
 			}
 			if (e.isFileLoaded == false && etap == 5) {
-				e = textfile(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
+				e = textfile(e);
 				e.k = strlen(e.textBuffer);
 			}
-			e.texth = MeasureTextEx(e.inter, e.textBuffer, 20, 2.0f).y;
+			e.texth = MeasureTextEx(e.inter, e.textBuffer, 26, 2.0f).y;
 			e.maxScroll = e.texth + 100;
-			if (!e.wp) {
+			if (!e.wp&&!e.savewin&&!e.enigmaswtch&&!e.xorSwitch) {
 				e = Scrollogic(e);
 			}
 			BeginScissorMode(10, 168, 1346, 584);
 			if (e.cursor) {
-				DrawRectangle(e.x, e.cursorY, 12, 3, RAYWHITE);
+				DrawRectangle(e.x, e.cursorY+2, 12, 3, RAYWHITE);
 			}
-			DrawTextEx(e.inter, e.textBuffer, (Vector2) { 30, 180 - e.scrolloffset }, 20, 2.0f, RAYWHITE);
+			DrawTextEx(e.inter, e.textBuffer, (Vector2) { 30, 180 - e.scrolloffset }, 26, 2.0f, RAYWHITE);
 			DrawTexture(e.bscroll, 1325, e.scrollY, WHITE);
 			EndScissorMode();
-			if (e.times > 0) {
-				DrawTexture(e.saveb2, 1070, 58, WHITE);
+			if (e.savetime > 0) {
 				DrawTexture(e.saveb3, 0, 717, WHITE);
-				e.times--;
-				if (e.times == 1) {
-					Savefile(e, d.f1, d.f2, d.folders[0].f, d.folders[1].f, d.folders[2].f, d.folders[3].f, d.folders[4].f);
-				}
+				e.savetime--;
+			}
+			if (e.savewin) {
+				e = SaveWindow(e);
 			}
 			else {
-				if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1065, 36, 172, 50 }) && !e.wp&&e.save) {
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 1065, 56, 172, 50 }) && !e.wp&&e.save&&!e.enigmaswtch && !e.xorSwitch) {
 					DrawTexture(e.saveb1, 1035, 26, WHITE);
 					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-						e.times = 20;
+						e.savewin = true;
 					}
 				}
 				else {
 					DrawTexture(e.saveb, 1065, 56, WHITE);
 				}
 			}
-			if (e.edit) {
+			if (e.edit&&!e.enigmaswtch&&!e.xorSwitch) {
 				if (IsKeyPressed(KEY_BACKSPACE) || IsKeyPressedRepeat(KEY_BACKSPACE)) {
 					e.bs = true;
 				}
@@ -439,7 +468,7 @@ int main(void) {
 				}
 				e = editmode(e);
 				if ((((a.fps / 20) % 3) == 0) || (((a.fps / 20) % 3) == 1)) {
-					float lineH = MeasureTextEx(e.inter, "A", 22, 2.0f).y;
+					float lineH = MeasureTextEx(e.inter, "A", 28, 2.0f).y;
 					e.cursorY = (180 - e.scrolloffset) + ((e.linecout - 1) * lineH) + 14;
 					e.cursor = true;
 				}
@@ -448,27 +477,130 @@ int main(void) {
 				}
 			}
 			else {
-				DrawTexture(e.novedit, 0, 112, WHITE);
+				if (!e.enigmaswtch && !e.xorSwitch) {
+					DrawTexture(e.novedit, 0, 112, WHITE);
+				}
 				if (e.wp) {
 					DrawTexture(e.winp, 0, 552, WHITE);
 					e = editpassword(e);
 					DrawTextEx(e.inter, e.password, (Vector2) { 175, 645 }, 24, 2.0f, BLACK);
 				}
 				else {
-					if (CheckCollisionPointRec(GetMousePosition(), (Rectangle) { 1172, 97, 146, 38 })) {
+					if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 1172, 117, 146, 38 }) && !e.enigmaswtch&&!e.xorSwitch) {
 						DrawTexture(e.editb1, 1142, 87, WHITE);
-
 						if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
 							e.wp = true;
 							e.i1 = 0;
 						}
 					}
 					else {
-						DrawTexture(e.editb, 1172, 117, WHITE);
+						if (!e.enigmaswtch && !e.xorSwitch) {
+							DrawTexture(e.editb, 1172, 117, WHITE);
+						}
 					}
 				}
 			}
+			if (e.enigmaswtch) {
+				e=Enigma(e);
+				DrawTextEx(e.inter, e.numBuffer0, (Vector2) { 540, 388 }, 24, 2.0f, BLACK);
+				DrawTextEx(e.inter, e.numBuffer1, (Vector2) { 676, 388 }, 24, 2.0f, BLACK);
+				DrawTextEx(e.inter, e.numBuffer2, (Vector2) { 812, 388 }, 24, 2.0f, BLACK);
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 521, 384, 68, 30 })&&!e.starten[0]) {
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						memset(e.ennumber, false, 3);
+						e.ennumber[0] = true;
+					}
+				}
+				else {
+				}
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 657, 384, 68, 30 })&&!e.starten[1]) {
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						memset(e.ennumber, false, 3);
+						e.ennumber[1] = true;
+					}
+				}
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 793, 384, 68, 30 })&&!e.starten[2]) {
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						memset(e.ennumber, false, 3);
+						e.ennumber[2] = true;
+					}
+				}
+				else {
+				}
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 505, 426, 100, 32 })&&!e.starten[0]&& e.ennumber[0]) {
+					DrawTexture(e.ok5b1, 505,426, WHITE);
+
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.enok[0] = true;
+					}
+				}
+				else {
+					DrawTexture(e.ok5b, 505, 426, WHITE);
+				}
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 641, 426, 100, 32 }) && !e.starten[1]&& e.ennumber[1]) {
+					DrawTexture(e.ok5b1, 641, 426, WHITE);
+
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.enok[1] = true;
+					}
+				}
+				else {
+					DrawTexture(e.ok5b, 641, 426, WHITE);
+				}
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 777, 426, 100, 32 }) && !e.starten[2]&& e.ennumber[2]) {
+					DrawTexture(e.ok5b1, 777, 426, WHITE);
+
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.enok[2] = true;
+					}
+				}
+				else {
+					DrawTexture(e.ok5b, 777, 426, WHITE);
+				}
+			}
+			if (e.xorSwitch) {
+				e = XOR(e);
+				DrawTextEx(e.inter, e.keyBuffer, (Vector2) { 538, 388 }, 24, 2.0f, BLACK);
+				if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 777, 426, 100, 32 })) {
+					DrawTexture(e.ok5b1, 777, 426, WHITE);
+					if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+						e.xorok = true;
+					}
+				}
+				else {
+					DrawTexture(e.ok5b, 777, 426, WHITE);
+				}
+			}
+			if (e.cyp) {
+				e = Cypherbutton(e);
+			}
+			if (CheckCollisionPointRec(virtualMouse, (Rectangle) { 127, 63, 217, 30 })&& !e.wp&&! e.savewin&&!e.enigmaswtch&&!e.xorSwitch) {
+				if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+					if (!e.cyp) {
+						e.cyp = true;
+					}
+					else {
+						e.cyp = false;
+					}
+				}
+			}
+			if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+				if (!CheckCollisionPointRec(virtualMouse, (Rectangle) { 97, 33, 277, 386 })) {
+					e.cyp = false;
+				}
+			}
+			if (!e.cyp) {
+				DrawTexture(e.cypher, 319, 72, WHITE);
+				cypheractived(e);
+			}
 		}
+		EndTextureMode();
+		BeginDrawing();
+		ClearBackground(BLACK);
+		DrawTexturePro(target.texture,(Rectangle) {0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height},
+			(Rectangle) {(GetScreenWidth() - ((float)1366 * scale)) * 0.5f,
+			(GetScreenHeight() - ((float)768 * scale)) * 0.5f, (float)1366 * scale, (float)768 * scale},
+			(Vector2) {0, 0}, 0.0f, WHITE);
 		EndDrawing();
 	}
 	UnloadTexture(a.dms);
@@ -555,8 +687,45 @@ int main(void) {
 	UnloadTexture(e.textf5);
 	UnloadTexture(e.textf6);
 	UnloadTexture(e.textf7);
-	UnloadFont(e.inter);
-	memset(e.textBuffer, 0, sizeof(e.textBuffer));
+	UnloadTexture(e.winp);
+	UnloadTexture(e.continueb);
+	UnloadTexture(e.continueb1);
+	UnloadTexture(e.exit);
+	UnloadTexture(e.exit1);
+	UnloadTexture(e.saveb);
+	UnloadTexture(e.saveb1);
+	UnloadTexture(e.saveb2);
+	UnloadTexture(e.saveb3);
+	UnloadTexture(e.cypherrr);
+	UnloadTexture(e.cypher);
+	UnloadTexture(e.cypher1);
+	UnloadTexture(e.cypher2);
+	UnloadTexture(e.cypher3);
+	UnloadTexture(e.cypher4);
+	UnloadTexture(e.cypher2act);
+	UnloadTexture(e.cypher3act);
+	UnloadTexture(e.cypher4act);
+	UnloadTexture(e.savewindow);
+	UnloadTexture(e.cencel5b);
+	UnloadTexture(e.cencel5b1);
+	UnloadTexture(e.ok5b);
+	UnloadTexture(e.ok5b1);
+	UnloadTexture(e.enigmawin);
+	UnloadTexture(e.frame);
+	UnloadTexture(e.xorwin);
 	memset(e.tempLine, 0, sizeof(e.tempLine));
+	if(e.textBuffer != NULL) {
+		free(e.textBuffer);
+	}
+	if (e.backText != NULL) {
+		free(e.backText);
+	}
+	if (e.backText1 != NULL) {
+		free(e.backText1);
+	}
+	if (e.backText2 != NULL) {
+		free(e.backText2);
+	}
+	CypherFile();
 	CloseWindow();
 }
